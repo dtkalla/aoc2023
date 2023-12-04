@@ -199,14 +199,22 @@ Card 196: 76 48 15 89 44 50 79 80 52 78 | 93 55 21 18 73 31 47 20 97 83 87 30  6
 Card 197: 67 21 75 10  9  6 47 88 45 70 | 91 95 58 82 52 50 87 81 78 13 64 53 57 14 55 25 36 76 19 86 56  2 16 54  1"
 
 total = 0
-cards = cards.split("\n")
-cards.map! { |card| card.split(":")[1] }
-cards.each do |card|
+@cards = cards.split("\n")
+@cards.map! { |card| card.split(":")[1] }
+@cards.map!.with_index do |card,i|
     winning,has = card.split('|')
     winning = winning.split(' ').reject { |ele| ele == '' }.to_set
     has = has.split(' ')
     cnt = has.count { |ele| winning.include?(ele) }
-    total += 2**(cnt-1) if cnt > 0
+    (i+1..i+cnt).to_a
 end
 
-p total
+@memo = {}
+def score(i)
+    return @memo[i] if @memo[i]
+    total = 1
+    @cards[i].each { |j| total += score(j) }
+    @memo[i] = total
+end
+
+p (0...@cards.length).map { |i| score(i) }.sum
