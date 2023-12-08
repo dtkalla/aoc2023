@@ -1002,7 +1002,7 @@ Q7KQQ 515
 def max_val(cards)
     jokers = cards.count(1)
     return [5] if jokers == 5
-    cards.reject! { |card| card == 1 }
+    cards = cards.reject { |card| card == 1 }
     count = cards.tally.values.sort.reverse
     count[0] += jokers
     count
@@ -1012,7 +1012,7 @@ hands = s.split("\n")
 hands.map! do |hand|
     hand,bid = hand.split(' ')
     convert = {}
-    "FJ23456789T1QKA".each_char.with_index { |char,i| convert[char] = i }
+    "_J23456789T_QKA".each_char.with_index { |char,i| convert[char] = i }
     cards = hand.chars.map { |ele| convert[ele] }
     # count = cards.tally.values.sort.reverse
     count = max_val(cards)# if cards.include?(1)
