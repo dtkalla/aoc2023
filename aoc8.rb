@@ -752,18 +752,29 @@ DSK = (DBJ, PKP)
 BQR = (MLS, DMR)
 HBB = (CCR, HLK)"
 
+nodes = []
 s.split("\n").each do |row|
     convert[[row[0..2],'L']] = row[7...10]
     convert[[row[0..2],'R']] = row[12...15]
+    nodes << row[0..2] if row[2] == "A"
 end
 
-i = 0
-curr = "AAA"
 
-until curr == "ZZZ"
-    curr = convert[[curr,dirs[0]]]
-    i += 1
-    dirs << dirs.shift
+def num_times(node,dirs,convert)
+    i = 0
+    dirs = dirs.dup
+    until node[2] == "Z"
+        node = convert[[node,dirs[0]]]
+        i += 1
+        dirs << dirs.shift
+    end
+    i
 end
 
-p i
+nodes.map! { |node| num_times(node,dirs,convert) }
+
+p nodes
+
+res = 1
+nodes.each { |node| res = res.lcm(node) }
+p res
