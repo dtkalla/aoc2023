@@ -190,6 +190,11 @@ def main(seeds)
     2486274802 4162599840 35752676
     3596423501 4198352516 96614780"
     htl = extract_intervals(s)
+    res = []
+    (0...seeds.length/2).each do |i|
+        (seeds[2*i]...seeds[2*i]+seeds[2*i+1]).each { |k| res << k }
+    end
+    seeds = res
 
     [sts,stf,ftw,wtl,ltt,tth,htl].each { |arr| convert(arr,seeds) }
 
@@ -206,6 +211,7 @@ def convert(arr,seeds)
         end
         res
     end
+    seeds.uniq!
 end
 
 
