@@ -190,15 +190,18 @@ def main(seeds)
     2486274802 4162599840 35752676
     3596423501 4198352516 96614780"
     htl = extract_intervals(s)
-    res = []
+    
+    temp = []
     (0...seeds.length/2).each do |i|
-        (seeds[2*i]...seeds[2*i]+seeds[2*i+1]).each { |k| res << k }
+        temp << [seeds[2*i],seeds[2*i]+seeds[2*i+1]]
     end
-    seeds = res
+    seeds = temp
 
-    [sts,stf,ftw,wtl,ltt,tth,htl].each { |arr| convert(arr,seeds) }
+    p [sts,stf,ftw,wtl,ltt,tth,htl].map! { |arr| arr.sort }
+    # [sts,stf,ftw,wtl,ltt,tth,htl].each { |arr| convert(arr,seeds) }
+    seeds
 
-    seeds.min
+    # seeds.min
 end
 
 def convert(arr,seeds)
