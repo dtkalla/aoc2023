@@ -1,3 +1,5 @@
+require 'set'
+
 grid = "L7L7F|7-77F7---LF7L7L7.L-7-F7.F-F-77.|.FJ7J7FF|.F-FF7FL..--77F-F--77FF7FFF77L|777F7F--F-FL7F-7F-7FJ7-FJ-77.F-|--F7-J7FJ7F.LF-|JF-FJ777|-|F77
 F-|7|JL.J-|--L-7J--|LF-F|L7-L7|L|LJ7FJ--L-7|FJ|7JLLL--JFFJ|LJ-F7J7|7LJF7-FLLJ|L77.LJ.FJ-JL7-JF-7|FFJ.|L7|L-|-7-L--7J|.|-LFJJ.FJ--JJ|7FJLFJ.7
 FJ|FF-JFJFJ.J|L|FJ.|J|7---|JL-7.-JLL7LL.7LL-7F--7--FJ..L-F7L|.-J||J7JJ||FL|7-|-|FJJ|-|..7.||FF|L-77JFJ.|LJ|..|JF.FJ-LF7|F|L-7L7F--J.FJ.L|.LL
@@ -140,7 +142,7 @@ F||J|J.FF7FFJL-FJL|.FJ|.L7-F-7.L77.L.L-L-7LL|L.|7L77LFJ7|LLL|--L-7-F7J.|.F-J--|L
 7L-7JLJLJ.L-JLL|-LJL|JJF-J7-7L-J-LF-JJ.--F7-JL-7JJ.L--.J-JL|L-F--F-|J.-JJ-7LL-.L-JL.L|7-JLLJJ-J-LJJ.J.-L-J-L7-F-|.JJ--7JLLFJJ..LL-JL|-F.JJ.J"
 
 grid = grid.split("\n").map { |line| line.split("") }
-dirs = [[1,0],[0,1],[-1,0],[0,-1]]
+dirs = [[1,0,'S|F7','|JL'],[0,1,'S-LF','-J7'],[-1,0,'S|JL','|F7'],[0,-1,'S-J7','-LF']]
 m,n = grid.length,grid[0].length
 
 i,j = 0,0
@@ -152,4 +154,28 @@ i,j = 0,0
     end
 end
 
-p [i,j]
+queue = [[i,j,0]]
+checked = Set[[i,j]]
+
+res = 0
+
+until queue.empty?
+    i,j,dist = queue.shift
+    dirs.each do |a,b,start,goal|
+        c,d = a+i,b+j
+        if (0...m).cover?(c) && (0...n).cover?(d) && !checked.include?([c,d])
+            if start.include?(grid[i][j]) && goal.include?(grid[c][d])
+                checked.add([c,d])
+                queue << [c,d,dist+1]
+            end
+        end
+    end
+    res = dist
+end
+
+p grid[126][87..89]
+p grid[127][87..89]
+p grid[128][87..89]
+p grid[129][87..89]
+
+p res
