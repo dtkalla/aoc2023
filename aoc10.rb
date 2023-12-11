@@ -141,7 +141,20 @@ F||J|J.FF7FFJL-FJL|.FJ|.L7-F-7.L77.L.L-L-7LL|L.|7L77LFJ7|LLL|--L-7-F7J.|.F-J--|L
 .F|7|JF|.F7.FF-777LJ|L-7LF.LLLF7L|7F7LL-L7.L|J7FF7J7.|-.L7F-J||L7|L|JJ.L7.FLF7L7L7-|J||7-|FLL7FF77J-FF7LL7.L7LFJJLF7L-7|-F7L---L7LJL--7LL7..
 7L-7JLJLJ.L-JLL|-LJL|JJF-J7-7L-J-LF-JJ.--F7-JL-7JJ.L--.J-JL|L-F--F-|J.-JJ-7LL-.L-JL.L|7-JLLJJ-J-LJJ.J.-L-J-L7-F-|.JJ--7JLLFJJ..LL-JL|-F.JJ.J"
 
+grid = 
+"FF7FSF7F7F7F7F7F---7
+L|LJ||||||||||||F--J
+FL-7LJLJ||||||LJL-77
+F--JF--7||LJLJ7F7FJ-
+L---JF-JLJ.||-FJLJJ7
+|F|F-JF---7F7-L7L|7|
+|FFJF7L7F-JF7|JL---7
+7-L-JL7||F7|L7F-7F7|
+L.L7LFJ|||||FJL7||LJ
+L7JLJL-JLJLJL--JLJ.L"
+
 grid = grid.split("\n").map { |line| line.split("") }
+
 dirs = [[1,0,'S|F7','|JL'],[0,1,'S-LF','-J7'],[-1,0,'S|JL','|F7'],[0,-1,'S-J7','-LF']]
 m,n = grid.length,grid[0].length
 
@@ -154,10 +167,13 @@ i,j = 0,0
     end
 end
 
-queue = [[i,j,0]]
-checked = Set[[i,j]]
+queue = [[i+1,j,1],[i,j-1,1]]
+wall = []
+checked = Set[[i,j],[i+1,j],[i,j-1]]
 
-res = 0
+# queue = [[i-1,j,1],[i+1,j,1]]
+# wall = []
+# checked = Set[[i,j],[i-1,j],[i+1,j]]
 
 until queue.empty?
     i,j,dist = queue.shift
@@ -166,16 +182,73 @@ until queue.empty?
         if (0...m).cover?(c) && (0...n).cover?(d) && !checked.include?([c,d])
             if start.include?(grid[i][j]) && goal.include?(grid[c][d])
                 checked.add([c,d])
+                wall << [a+c,b+d]
                 queue << [c,d,dist+1]
             end
         end
     end
-    res = dist
 end
 
-p grid[126][87..89]
-p grid[127][87..89]
-p grid[128][87..89]
-p grid[129][87..89]
+checked = checked.to_a.map { |arr| [arr[0]*2,arr[1]*2] }.to_set
+wall.each { |ele| checked.add(ele) }
 
-p res
+new_grid = []
+extra_row = ('.' * m).split('')
+grid.each do |row|
+    new_grid << row
+    new_grid << extra_row
+end
+grid = new_grid
+grid.pop
+grid.map! { |row| row.join('.').split('') }
+
+m,n = grid.length,grid[0].length
+
+(0...m).each do |i|
+    queue = []
+    queue << [i,0] unless checked.include?([i,0])
+    queue << [i,n-1] unless checked.include?([i,n-1])
+    checked.add([i,0])
+    checked.add([i,n-1])
+    until queue.empty?
+        i,j = queue.shift
+        dirs.each do |dir|
+            a,b = dir[0..1]
+            c,d = a+i,b+j
+            if (0...m).cover?(c) && (0...n).cover?(d) && !checked.include?([c,d])
+                checked.add([c,d])
+                queue << [c,d]
+            end
+        end
+    end
+end
+
+(1...n-1).each do |i|
+    queue = []
+    queue << [0,i] unless checked.include?([0,i])
+    queue << [m-1,i] unless checked.include?([m-1,i])
+    checked.add([0,i])
+    checked.add([m-1,i])
+    until queue.empty?
+        i,j = queue.shift
+        dirs.each do |dir|
+            a,b = dir[0..1]
+            c,d = a+i,b+j
+            if !checked.include?([c,d]) && (0...m).cover?(c) && (0...n).cover?(d)
+                checked.add([c,d])
+                queue << [c,d]
+            end
+        end
+    end
+end
+
+p checked.to_a.sort.select { |arr| arr[0] % 2 == 0 && arr[1] % 2 == 0 }
+
+total = 0
+(0...m).each do |i|
+    (0...n).each do |j|
+        total += 1 if (!checked.include?([i,j]) && i % 2 == 0 && j % 2 == 0)
+    end
+end
+
+p total
