@@ -1352,16 +1352,16 @@ def match?(arr1,arr2)
     true
 end
 
-def row_score(image)
+def row_score(image,restricted=nil)
     (1...image.length).each do |i|
-        return i if match?(image[0...i],image[i..-1])
+        return i if match?(image[0...i],image[i..-1]) && i != restricted
     end
     0
 end
 
 def score(image)
     transposed = image.transpose
-    row,col = row_score(image) + row_score(transposed)
+    row,col = row_score(image),row_score(transposed)
     m,n = image.length,image[0].length
 
     (0...m).each do |i|
@@ -1369,11 +1369,12 @@ def score(image)
             image[i][j] = (image[i][j] == "." ? '#' : '.')
             transposed[j][i] = image[i][j]
 
-            try = row_score(image)
-            return 100 * try if try != row && try != 0
 
-            try = row_score(transposed)
-            return try if try != col && try != 0
+            try = row_score(image,row)
+            return 100 * try if try != 0
+
+            try = row_score(transposed,col)
+            return try if try != 0
 
             image[i][j] = (image[i][j] == "." ? '#' : '.')
             transposed[j][i] = image[i][j]
@@ -1382,6 +1383,7 @@ def score(image)
 
     0
 end
+
 
 images.map! { |image| score(image) }
 
