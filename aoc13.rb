@@ -1356,7 +1356,7 @@ def row_score(image)
     (1...image.length).each do |i|
         return i if match?(image[0...i],image[i..-1])
     end
-    nil
+    0
 end
 
 def score(image)
@@ -1366,21 +1366,23 @@ def score(image)
 
     (0...m).each do |i|
         (0...n).each do |j|
-            image[i][j] = image[i][j] == "." ? '#' : '.'
+            image[i][j] = (image[i][j] == "." ? '#' : '.')
             transposed[j][i] = image[i][j]
 
             try = row_score(image)
-            return 100 * try if try && try != row
+            return 100 * try if try != row && try != 0
 
             try = row_score(transposed)
-            return try if try && try != col
+            return try if try != col && try != 0
 
-            image[i][j] = image[i][j] == "." ? '#' : '.'
+            image[i][j] = (image[i][j] == "." ? '#' : '.')
             transposed[j][i] = image[i][j]
         end
     end
+
+    0
 end
 
 images.map! { |image| score(image) }
 
-p images
+p images.sum
