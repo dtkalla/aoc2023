@@ -1,5 +1,8 @@
 def extract_intervals(s)
-    s.split("\n").map { |line| line.split(' ').map(&:to_i) }.sort
+    s.split("\n").map do |line|
+        val,start,range = line.split(' ').map(&:to_i)
+        [start,start+range,start-val]
+    end
 end
 
 def main(seeds)
@@ -193,28 +196,39 @@ def main(seeds)
     
     temp = []
     (0...seeds.length/2).each do |i|
-        temp << [seeds[2*i],seeds[2*i]+seeds[2*i+1]]
+        temp << [seeds[2*i],seeds[2*i]+seeds[2*i+1],0]
     end
     seeds = temp
 
-    p [sts,stf,ftw,wtl,ltt,tth,htl].map! { |arr| arr.sort }
-    # [sts,stf,ftw,wtl,ltt,tth,htl].each { |arr| convert(arr,seeds) }
+    # p [sts,stf,ftw,wtl,ltt,tth,htl].map! { |arr| arr.sort }
+    [sts,stf,ftw,wtl,ltt,tth,htl].each { |arr| seeds = convert(arr,seeds) }
     seeds
 
     # seeds.min
 end
 
 def convert(arr,seeds)
-    seeds.map! do |seed|
-        res = seed
-        arr.each do |val,start,range|
-            if seed >= start && seed < start + range
-                res = val + seed - start
+    ints = []
+
+    seeds.each do |seed|
+        ints << seed
+        left,right,add = seed
+        i = 0
+        # p seed
+
+        # p arr
+        while arr[i] && arr[i][0] <= right
+            if arr[i][1] <= left
+                i += 1
+                next
             end
+            ints << [[left,arr[i][0]].max+add,
+                     [right,arr[i][1]].min+add,
+                     arr[i][2]+add] 
+            i += 1
         end
-        res
     end
-    seeds.uniq!
+    ints.sort
 end
 
 
