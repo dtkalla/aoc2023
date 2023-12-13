@@ -1009,31 +1009,31 @@ def ways(i,j)
     return @memo[[i,j]] if @memo[[i,j]]
 
     res = 0
-    res += ways(i+1,j) if res[i] != '#'
+    res += ways(i+1,j) if @s[i] != '#'
     num = @nums[j]
     if @s.length >= i + num
-        if (0...@nums[j]).all? { |k| ['#','?'].include?(@s[i+k]) }
-            res += ways(i+num+1,j+1) if !@s[i+num] || @s[i+num] != '#'
+        if (0...num).all? { |k| @s[i+k] != '.' }
+            res += ways(i+num+1,j+1) if (!@s[i+num] || @s[i+num] != '#')
         end
     end
 
-    p [i,j,res]
     @memo[[i,j]] = res
 end
 
 def find_ways(s,nums)
     @memo = {}
-    @s,@nums = s.split(""),nums
+    @s,@nums = s,nums
     ways(0,0)
 end
 
 def num_line(line)
     s,nums = line.split(" ")
     nums = nums.split(",").map(&:to_i)
+    s = [s,s,s,s,s].join("?").split("")
+    nums = [nums,nums,nums,nums,nums].flatten
     find_ways(s,nums)
 end
 
-# lines = lines.split("\n").map { |line| num_line(line) }
-num_line(lines.split("\n")[998])
+lines = lines.split("\n").map { |line| num_line(line) }
 
-# p lines.map.with_index { |line,i| [line,i+2] }
+p lines.sum
