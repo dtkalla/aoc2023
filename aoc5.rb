@@ -1,7 +1,7 @@
 def extract_intervals(s)
     s.split("\n").map do |line|
         val,start,range = line.split(' ').map(&:to_i)
-        [start,start+range,start-val]
+        [start,start+range,val-start]
     end
 end
 
@@ -194,15 +194,21 @@ def main(seeds)
     3596423501 4198352516 96614780"
     htl = extract_intervals(s)
     
-    temp = []
-    (0...seeds.length/2).each do |i|
-        temp << [seeds[2*i],seeds[2*i]+seeds[2*i+1],0]
-    end
-    seeds = temp
+    seeds.map! { |seed| [seed,seed+1,0] }
+    seeds.sort!
+    p seeds
 
-    # p [sts,stf,ftw,wtl,ltt,tth,htl].map! { |arr| arr.sort }
-    [sts,stf,ftw,wtl,ltt,tth,htl].each { |arr| seeds = convert(arr,seeds) }
-    seeds
+    # temp = []
+    # (0...seeds.length/2).each do |i|
+        # temp << [seeds[2*i],seeds[2*i]+seeds[2*i+1],0]
+    # end
+    # p seeds = temp.sort
+
+    [sts,stf,ftw,wtl,ltt,tth,htl].each { |arr| arr.sort! }
+    # seeds = convert(sts,seeds)
+    [sts,stf,ftw,wtl,ltt,tth,htl].each { |arr| convert(arr,seeds) }
+    seeds.map! { |arr| arr[0] + arr[2] }
+    p seeds.sort
 
     # seeds.min
 end
@@ -211,12 +217,10 @@ def convert(arr,seeds)
     ints = []
 
     seeds.each do |seed|
-        ints << seed
         left,right,add = seed
+        ints << [left+add,[right,arr[0][0]].min+add,0] if left < arr[0][0] 
         i = 0
-        # p seed
 
-        # p arr
         while arr[i] && arr[i][0] <= right
             if arr[i][1] <= left
                 i += 1
@@ -224,7 +228,7 @@ def convert(arr,seeds)
             end
             ints << [[left,arr[i][0]].max+add,
                      [right,arr[i][1]].min+add,
-                     arr[i][2]+add] 
+                     arr[i][2]] 
             i += 1
         end
     end
@@ -233,4 +237,4 @@ end
 
 
 seeds = "3121711159 166491471 3942191905 154855415 3423756552 210503354 2714499581 312077252 1371898531 165242002 752983293 93023991 3321707304 21275084 949929163 233055973 3626585 170407229 395618482 226312891"
-p main(seeds)
+main(seeds)
