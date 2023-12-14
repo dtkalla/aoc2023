@@ -194,31 +194,24 @@ def main(seeds)
     3596423501 4198352516 96614780"
     htl = extract_intervals(s)
     
-    seeds.map! { |seed| [seed,seed+1,0] }
-    seeds.sort!
-    p seeds
 
-    # temp = []
-    # (0...seeds.length/2).each do |i|
-        # temp << [seeds[2*i],seeds[2*i]+seeds[2*i+1],0]
-    # end
-    # p seeds = temp.sort
+    temp = []
+    (0...seeds.length/2).each do |i|
+        temp << [seeds[2*i],seeds[2*i]+seeds[2*i+1],0]
+    end
+    p seeds = temp.sort
 
     [sts,stf,ftw,wtl,ltt,tth,htl].each { |arr| arr.sort! }
-    # seeds = convert(sts,seeds)
-    [sts,stf,ftw,wtl,ltt,tth,htl].each { |arr| convert(arr,seeds) }
-    seeds.map! { |arr| arr[0] + arr[2] }
-    p seeds.sort
-
-    # seeds.min
+    [sts,stf,ftw,wtl,ltt,tth,htl].each { |arr| seeds = convert(arr,seeds) }
+    p seeds.sort[0][0]
 end
 
 def convert(arr,seeds)
     ints = []
 
     seeds.each do |seed|
-        left,right,add = seed
-        ints << [left+add,[right,arr[0][0]].min+add,0] if left < arr[0][0] 
+        left,right = seed
+        ints << [left,[right,arr[0][0]].min] if left < arr[0][0] 
         i = 0
 
         while arr[i] && arr[i][0] <= right
@@ -226,9 +219,8 @@ def convert(arr,seeds)
                 i += 1
                 next
             end
-            ints << [[left,arr[i][0]].max+add,
-                     [right,arr[i][1]].min+add,
-                     arr[i][2]] 
+            ints << [[left,arr[i][0]].max+arr[i][2],
+                     [right,arr[i][1]].min+arr[i][2]] 
             i += 1
         end
     end
